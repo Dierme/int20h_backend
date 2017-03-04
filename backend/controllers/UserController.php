@@ -11,6 +11,7 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use frontend\models\UserSignupForm;
+use yii\web\MethodNotAllowedHttpException;
 
 /**
  * UserController implements the CRUD actions for user model.
@@ -24,6 +25,7 @@ class UserController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'index' => ['get'],
+                    'create' => ['post'],
                 ],
             ]
         ];
@@ -32,6 +34,8 @@ class UserController extends Controller
     /**
      * @param \yii\base\Action $event
      * @return bool
+     * @throws MethodNotAllowedHttpException
+     * @throws NotFoundHttpException
      */
     public function beforeAction($event)
     {
@@ -40,19 +44,14 @@ class UserController extends Controller
         if (isset($this->actions[$action])) {
             $verbs = $this->actions[$action];
         } else {
-            $this->setHeader(500);
-            echo json_encode(array('status' => 0, 'error_code' => 500, 'message' => 'Routing for method not specified'), JSON_PRETTY_PRINT);
-            exit;
+            throw new NotFoundHttpException('Method not found');
         }
         $verb = Yii::$app->getRequest()->getMethod();
 
         $allowed = array_map('strtoupper', $verbs);
 
         if (!in_array($verb, $allowed)) {
-
-            $this->setHeader(400);
-            echo json_encode(array('status' => 0, 'error_code' => 400, 'message' => 'Method not allowed'), JSON_PRETTY_PRINT);
-            exit;
+            throw new MethodNotAllowedHttpException('Method is not allowed');
         }
 
         return true;
@@ -61,10 +60,21 @@ class UserController extends Controller
     public function actionIndex()
     {
         $users = [
-            '0' => ['name' => 'testUser0', 'role'=>'admin'],
-            '1' => ['name' => 'testUser1', 'role'=>'admin']
+            '0' => ['name' => 'testUser0', 'role' => 'admin'],
+            '1' => ['name' => 'testUser1', 'role' => 'admin']
         ];
 
         return $users;
+    }
+
+
+    public function actionCreate()
+    {
+        $response = [
+            'success'   =>  true,
+            'message'   =>  'User created'
+        ];
+
+        return $response;
     }
 }
