@@ -1,7 +1,15 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: kalim_000
+ * Date: 3/5/2017
+ * Time: 12:45 AM
+ */
 
 namespace backend\controllers;
 
+use common\models\Category;
+use common\models\News;
 use Yii;
 use common\components\VKClient;
 use yii\web\Controller;
@@ -14,7 +22,7 @@ use yii\web\MethodNotAllowedHttpException;
 /**
  * UserController implements the CRUD actions for user model.
  */
-class UserController extends Controller
+class NewsController extends Controller
 {
     public function behaviors()
     {
@@ -22,7 +30,9 @@ class UserController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'get-profile' => ['get'],
+                    'get-featured' => ['get'],
+                    'all' => ['get'],
+                    'get-by-category' => ['get']
                 ],
             ]
         ];
@@ -54,25 +64,39 @@ class UserController extends Controller
         return true;
     }
 
-    public function actionGetProfile()
+    /**
+     * @return array|\yii\db\ActiveRecord[]
+     */
+    public function actionGetFeatured()
     {
-        $get = \Yii::$app->request->get();
-        if (!isset($get['access_token'])) {
-            throw new BadRequestHttpException('scope param is missing');
-        }
-        $vkClient = new VKClient($get['access_token']);
-        $profile = $vkClient->getUserProfile();
-        return $profile;
+        $featuredNews = News::find()->where(['featured' => 1])->all();
+
+        return $featuredNews;
     }
 
-
-    public function actionCreate()
+    public function actionGetByCategory()
     {
-        $response = [
-            'success'   =>  true,
-            'message'   =>  'User created'
-        ];
+        $get = \Yii::$app->request->get();
 
-        return $response;
+        if (empty($get['category'])) {
+            throw new BadRequestHttpException('categoty param is missing');
+        }
+
+        $categoryQuery = Category::find()->where(['name' => $get['category']]);
+
+        if (!$categoryQuery->exists()) {
+            throw new BadRequestHttpException('Specified category not found');
+        }
+
+        $category = $categoryQuery->one();
+
+        $news = News::find()->where(['category_id' => $category->id])->all();
+
+        return $news;
+    }
+
+    public function actionAll()
+    {
+        return News::find()->all();
     }
 }

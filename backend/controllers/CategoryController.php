@@ -1,9 +1,19 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: kalim_000
+ * Date: 3/5/2017
+ * Time: 1:18 AM
+ */
 
 namespace backend\controllers;
 
+
+namespace backend\controllers;
+
+use common\models\Category;
+use common\models\News;
 use Yii;
-use common\components\VKClient;
 use yii\web\Controller;
 use yii\web\Response;
 use yii\web\NotFoundHttpException;
@@ -14,7 +24,7 @@ use yii\web\MethodNotAllowedHttpException;
 /**
  * UserController implements the CRUD actions for user model.
  */
-class UserController extends Controller
+class CategoryController extends Controller
 {
     public function behaviors()
     {
@@ -22,7 +32,7 @@ class UserController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'get-profile' => ['get'],
+                    'all' => ['get'],
                 ],
             ]
         ];
@@ -54,25 +64,9 @@ class UserController extends Controller
         return true;
     }
 
-    public function actionGetProfile()
+
+    public function actionAll()
     {
-        $get = \Yii::$app->request->get();
-        if (!isset($get['access_token'])) {
-            throw new BadRequestHttpException('scope param is missing');
-        }
-        $vkClient = new VKClient($get['access_token']);
-        $profile = $vkClient->getUserProfile();
-        return $profile;
-    }
-
-
-    public function actionCreate()
-    {
-        $response = [
-            'success'   =>  true,
-            'message'   =>  'User created'
-        ];
-
-        return $response;
+        return Category::find()->all();
     }
 }

@@ -10,6 +10,7 @@ namespace backend\controllers;
 
 
 use common\models\SignupForm;
+use common\models\User;
 use common\models\Vkgroups;
 use common\models\VkProfile;
 use common\models\VkuserHasFriends;
@@ -167,6 +168,10 @@ class AuthController extends Controller
                             }
                         }
                     }
+                }
+                else{
+                    $user = User::findOne($vkProfile->user_id);
+                    $apiToken = $user->generateApiToken();
                 }
 
                 return [

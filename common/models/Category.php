@@ -5,21 +5,22 @@ namespace common\models;
 use Yii;
 
 /**
- * This is the model class for table "tags".
+ * This is the model class for table "category".
  *
  * @property int $id
  * @property string $name
  *
  * @property CategoryHasTags[] $categoryHasTags
+ * @property News[] $news
  */
-class Tags extends \yii\db\ActiveRecord
+class Category extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'tags';
+        return 'category';
     }
 
     /**
@@ -49,6 +50,14 @@ class Tags extends \yii\db\ActiveRecord
      */
     public function getCategoryHasTags()
     {
-        return $this->hasMany(CategoryHasTags::className(), ['tag_id' => 'id']);
+        return $this->hasMany(CategoryHasTags::className(), ['category_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getNews()
+    {
+        return $this->hasMany(News::className(), ['category_id' => 'id']);
     }
 }

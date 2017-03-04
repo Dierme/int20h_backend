@@ -13,10 +13,20 @@ class m170304_120347_tags extends Migration
             'name' => $this->string()->notNull(),
         ]);
 
-        $this->insert($this->tableName, ['name'=>'sport']);
-        $this->insert($this->tableName, ['name'=>'economy']);
-        $this->insert($this->tableName, ['name'=>'politics']);
-        $this->insert($this->tableName, ['name'=>'media']);
+        $this->insert($this->tableName, ['name'=>'scandal']);
+        $this->insert($this->tableName, ['name'=>'government']);
+
+        $this->insert($this->tableName, ['name'=>'money']);
+        $this->insert($this->tableName, ['name'=>'bank']);
+
+        $this->insert($this->tableName, ['name'=>'films']);
+        $this->insert($this->tableName, ['name'=>'songs']);
+
+        $this->insert($this->tableName, ['name'=>'football']);
+        $this->insert($this->tableName, ['name'=>'basketball']);
+
+        $this->insert($this->tableName, ['name'=>'animals']);
+        $this->insert($this->tableName, ['name'=>'forest']);
     }
 
     public function down()
