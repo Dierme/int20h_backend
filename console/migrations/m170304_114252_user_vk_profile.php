@@ -11,7 +11,7 @@ class m170304_114252_user_vk_profile extends Migration
         $this->createTable($this->tableName, [
             'id' => $this->primaryKey(),
             'user_id' => $this->integer(11)->notNull(),
-            'vk_uid' => $this->integer(11)->notNull(),
+            'vk_uid' => $this->integer(11)->notNull()->unique(),
             'name' => $this->string(255)->notNull(),
             'surname' => $this->string(255)->notNull(),
         ]);

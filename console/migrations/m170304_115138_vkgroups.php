@@ -10,7 +10,8 @@ class m170304_115138_vkgroups extends Migration
     {
         $this->createTable($this->tableName, [
             'id' => $this->primaryKey(),
-            'group_name' => $this->integer(11)->notNull(),
+            'gid'=> $this->integer(11)->notNull()->unique(),
+            'group_name' => $this->string()->notNull(),
         ]);
 
     }

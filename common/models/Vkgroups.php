@@ -8,7 +8,8 @@ use Yii;
  * This is the model class for table "vkgroups".
  *
  * @property int $id
- * @property int $group_name
+ * @property int $gid
+ * @property string $group_name
  *
  * @property VkuserHasVkgroups[] $vkuserHasVkgroups
  */
@@ -28,8 +29,10 @@ class Vkgroups extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['group_name'], 'required'],
-            [['group_name'], 'integer'],
+            [['gid', 'group_name'], 'required'],
+            [['gid'], 'integer'],
+            [['group_name'], 'string', 'max' => 255],
+            [['gid'], 'unique'],
         ];
     }
 
@@ -40,6 +43,7 @@ class Vkgroups extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'gid' => 'Gid',
             'group_name' => 'Group Name',
         ];
     }
@@ -50,5 +54,10 @@ class Vkgroups extends \yii\db\ActiveRecord
     public function getVkuserHasVkgroups()
     {
         return $this->hasMany(VkuserHasVkgroups::className(), ['vk_group_id' => 'id']);
+    }
+
+    public static function findByGid($gid)
+    {
+        return self::find()->where(['gid'=>$gid])->one();
     }
 }

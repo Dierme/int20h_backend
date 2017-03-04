@@ -9,7 +9,11 @@
 namespace backend\controllers;
 
 
+use common\models\SignupForm;
+use common\models\Vkgroups;
 use common\models\VkProfile;
+use common\models\VkuserHasFriends;
+use common\models\VkuserHasVkgroups;
 use Yii;
 use yii\web\Controller;
 use yii\web\Response;
@@ -18,6 +22,7 @@ use yii\filters\VerbFilter;
 use yii\web\MethodNotAllowedHttpException;
 use yii\web\BadRequestHttpException;
 use common\components\VKClient;
+use yii\web\ServerErrorHttpException;
 
 
 class AuthController extends Controller
@@ -94,19 +99,84 @@ class AuthController extends Controller
                     $userGroups = $vkClient->getUserGroups();
                     $userFriends = $vkClient->getUserFriends();
 
-                    return $userGroups;
-                    //TODO: create user sving to DB
+                    //sign up basic user stub
+                    $username = $userProfile['first_name'] . $userProfile['last_name'];
+                    $signUp = new SignupForm();
+                    $user = $signUp->signUpVkUser($username);
+
+                    if (!isset($user->id)) {
+                        throw new ServerErrorHttpException('Failed to register user in system');
+                    }
+                    $apiToken = $user->generateApiToken();
+
+
+                    //create user VK profile
+                    $vkParams = [
+                        'name' => $userProfile['first_name'],
+                        'surname' => $userProfile['last_name'],
+                        'user_id' => $user->id,
+                        'vk_uid' => $userProfile['uid']
+                    ];
+                    $userVkProfile = new VkProfile();
+                    $userVkProfile->setAttributes($vkParams);
+                    $userVkProfile->save();
+
+
+                    //save user VK groups
+                    foreach ($userGroups as $gid => $groupName) {
+                        $vkGroup = Vkgroups::findByGid($gid);
+                        if (is_null($vkGroup)) {
+                            $vkGroup = new Vkgroups();
+                            $vkGroup->setAttribute('gid', $gid);
+                            $vkGroup->setAttribute('group_name', $groupName);
+                            $vkGroup->save();
+                        }
+                        if (!isset($vkGroup->id)) {
+                            throw new ServerErrorHttpException('Failed to save group in system');
+                        }
+
+                        $userHasGroupQuery = VkuserHasVkgroups::find()->where([
+                            'vk_group_id' => $vkGroup->id,
+                            'vk_profile_id' => $userVkProfile->id
+                        ]);
+                        if (!$userHasGroupQuery->exists()) {
+                            $userHasGroup = new VkuserHasVkgroups();
+                            $userHasGroup->setAttribute('vk_group_id', $vkGroup->id);
+                            $userHasGroup->setAttribute('vk_profile_id', $userVkProfile->id);
+                            $userHasGroup->save();
+                        }
+                    }
+
+
+                    //save user VK friends, if they are registered
+                    foreach ($userFriends as $friendUid) {
+                        $friendVkProfile = VkProfile::findByUID($friendUid);
+
+                        if (!is_null($friendVkProfile)) {
+
+                            $userHasFriendQuery = VkuserHasFriends::find()->where([
+                                'vk_user_id' => $vkProfile->id,
+                                'vk_friend_id' => $friendVkProfile->id
+                            ]);
+
+                            if (!$userHasFriendQuery->exists()) {
+                                $userHasFriend = new VkuserHasFriends();
+                                $userHasFriend->setAttribute('vk_user_id', $vkProfile->id);
+                                $userHasFriend->setAttribute('vk_friend_id', $friendVkProfile->id);
+                                $userHasFriend->save();
+                            }
+                        }
+                    }
                 }
 
                 return [
                     'success' => true,
+                    'apiKey' => $apiToken,
                     'accessToken' => $accessToken['access_token']
                 ];
             } else {
                 throw new BadRequestHttpException('Failed to sign in to VK');
             }
-
-
         }
     }
 
@@ -119,7 +189,7 @@ class AuthController extends Controller
 
         $vkClient = new VKClient($get['access_token']);
 
-        return $vkClient->getUserFriends();
+        return $vkClient->getUserGroups();
     }
 
 

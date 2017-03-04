@@ -14,7 +14,7 @@ use yii\base\Model;
 /**
  * Signup form
  */
-abstract class SignupForm extends Model
+class SignupForm extends Model
 {
     public $username;
     public $email;
@@ -64,6 +64,18 @@ abstract class SignupForm extends Model
         $auth = \Yii::$app->authManager;
         $authorRole = $auth->getRole('admin');
         $auth->assign($authorRole, $user->getId());
+
+        return $user->save() ? $user : null;
+    }
+
+
+    public function signUpVkUser($username)
+    {
+        $user = new User();
+        $user->username = $username;
+        $user->email = 'test@email.com';
+        $user->setPassword(\Yii::$app->params['user']['autoPass']);
+        $user->generateAuthKey();
 
         return $user->save() ? $user : null;
     }

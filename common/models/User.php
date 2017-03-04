@@ -3,6 +3,7 @@ namespace common\models;
 
 use Yii;
 use yii\base\NotSupportedException;
+use yii\base\Security;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
@@ -62,6 +63,7 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             ['status', 'default', 'value' => array_search('Active', self::$statusDictionary)],
             ['status', StatusValidator::className()],
+            ['api_token', 'safe']
         ];
     }
 
@@ -205,11 +207,11 @@ class User extends ActiveRecord implements IdentityInterface
     {
 
         $roleQuery = AuthAssignment::find()->where([
-            'user_id'=>$userID,
-            'item_name'=>self::ROLE_ADMIN
+            'user_id' => $userID,
+            'item_name' => self::ROLE_ADMIN
         ]);
 
-        if($roleQuery->exists()){
+        if ($roleQuery->exists()) {
             return true;
         }
 
@@ -223,5 +225,17 @@ class User extends ActiveRecord implements IdentityInterface
     public function getAssignment()
     {
         return $this->hasOne(AuthAssignment::className(), ['user_id' => 'id']);
+    }
+
+
+    public function generateApiToken()
+    {
+        $security = new Security();
+
+        $this->api_token = $security->generateRandomString();
+
+        $this->save(false);
+
+        return $this->api_token;
     }
 }

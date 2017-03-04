@@ -84,7 +84,7 @@ class VKClient
             ]);
         }
 
-        return $profile['response'];
+        return $profile['response'][0];
     }
 
     /**
