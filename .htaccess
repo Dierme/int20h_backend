@@ -1,0 +1,35 @@
+<IfModule mod_rewrite.c>
+    Options +FollowSymlinks
+    RewriteEngine On
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    # deal with api first
+    RewriteCond %{REQUEST_URI} ^/(api)
+    RewriteRule ^api/assets/(.*)$ backend/web/assets/$1 [L]
+    RewriteRule ^api/css/(.*)$ backend/web/css/$1 [L]
+    RewriteRule ^api/img/(.*)$ backend/web/img/$1 [L]
+    RewriteRule ^api/js/(.*)$ backend/web/js/$1 [L]
+    RewriteRule ^api/fonts/(.*)$ backend/web/fonts/$1 [L]
+    RewriteRule ^api/uploads/(.*)/(.*)$ backend/web/uploads/$1/$2 [L]
+    RewriteRule ^api/plugins/(.*)/(.*)$ backend/web/plugins/$1/$2 [L]
+
+    RewriteCond %{REQUEST_URI} !^/backend/web/(assets|css|img|js|fonts|uploads)/
+    RewriteCond %{REQUEST_URI} ^/(api)
+    RewriteRule ^.*$ backend/web/index.php [L]
+
+    RewriteCond %{REQUEST_URI} ^/(assets|css|js|images|img|plugins)
+    RewriteRule ^assets/(.*)$ frontend/web/assets/$1 [L]
+    RewriteRule ^css/(.*)$ frontend/web/css/$1 [L]
+    RewriteRule ^js/(.*)$ frontend/web/js/$1 [L]
+    RewriteRule ^images/(.*)$ frontend/web/images/$1 [L]
+    RewriteRule ^img/(.*)$ frontend/web/img/$1 [L]
+    RewriteRule ^img/(.*)$ frontend/web/plugins/$1 [L]
+    RewriteRule ^(.*)$ frontend/web/$1 [L]
+
+    RewriteCond %{REQUEST_URI} !^/(frontend|backend)/web/(assets|css|js|img|images|plugins)/
+    RewriteCond %{REQUEST_URI} !index.php
+    RewriteCond %{REQUEST_FILENAME} !-f [OR]
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^.*$ frontend/web/index.php
+</IfModule>
