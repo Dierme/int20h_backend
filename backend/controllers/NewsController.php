@@ -102,16 +102,16 @@ class NewsController extends Controller
             $recommend->scoreCategoriesByGroups();
             $recommend->scoreCategoriesByActivity();
             $friendSawNews = $recommend->scoreCategoriesByFriendsActivity();
-            $categoriesScore =  $recommend->categoryScore;
+            $categoriesScore = $recommend->categoryScore;
 
-            foreach ($news as $key => $new){
-                if(isset($friendSawNews[$new['id']])){
+            foreach ($news as $key => $new) {
+                if (isset($friendSawNews[$new['id']])) {
                     $news[$key]['friends'] = $friendSawNews[$new['id']];
                 }
                 $news[$key]['score'] = $categoriesScore[$new['category_id']];
             }
 
-            usort($news, function($a, $b) {
+            usort($news, function ($a, $b) {
                 return $b['score'] <=> $a['score'];
             });
 
@@ -130,29 +130,29 @@ class NewsController extends Controller
             throw new BadRequestHttpException('id param is missing');
         }
 
-        if (empty($get['access_token'])) {
-            throw new BadRequestHttpException('access_token param is missing');
+        $news = News::findOne($get['id']);
+
+        if (is_null($news)) {
+            throw new BadRequestHttpException('News is not found');
         }
 
+        if (empty($get['access_token'])) {
+            return $news;
+        }
 
         $user = User::findByAccessToken($get['access_token']);
 
-        if(is_null($user)){
+        if (is_null($user)) {
             throw new BadRequestHttpException('user not found');
         }
 
-        $news = News::findOne($get['id']);
 
         $activity = new ActivityTracking();
         $activity->user_id = $user->id;
         $activity->news_id = $news->id;
         $activity->save();
 
-        if (is_null($news)) {
-            throw new BadRequestHttpException('News is not found');
-        }
-
-        return $news;
+       return $news;
     }
 
     public function actionAll()
@@ -162,20 +162,21 @@ class NewsController extends Controller
 
         if (!empty($get['access_token'])) {
             $recommend = new Recommendations($get['access_token']);
+//            return $recommend;
             $recommend->scoreCategoriesByGroups();
             $recommend->scoreCategoriesByActivity();
-            $friendSawNews = $recommend->scoreCategoriesByFriendsActivity();
-            $categoriesScore =  $recommend->categoryScore;
+//            $friendSawNews = $recommend->scoreCategoriesByFriendsActivity();
+            $categoriesScore = $recommend->categoryScore;
+////            return $categoriesScore;
 
-
-            foreach ($news as $key => $new){
-                if(isset($friendSawNews[$new['id']])){
-                    $news[$key]['friends'] = $friendSawNews[$new['id']];
-                }
+            foreach ($news as $key => $new) {
+//                if(isset($friendSawNews[$new['id']])){
+//                    $news[$key]['friends'] = $friendSawNews[$new['id']];
+//                }
                 $news[$key]['score'] = $categoriesScore[$new['category_id']];
             }
 
-            usort($news, function($a, $b) {
+            usort($news, function ($a, $b) {
                 return $b['score'] <=> $a['score'];
             });
 

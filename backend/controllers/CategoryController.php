@@ -33,9 +33,9 @@ class CategoryController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
+                    'tags' => ['get'],
                     'all' => ['get'],
                     'view' => ['get'],
-                    'tags' => ['get']
                 ],
             ]
         ];
@@ -67,8 +67,9 @@ class CategoryController extends Controller
         return true;
     }
 
-    public function Tags()
+    public function actionTags()
     {
+
         $get = \Yii::$app->request->get();
 
         if (empty($get['category_id'])) {
@@ -81,7 +82,7 @@ class CategoryController extends Controller
             throw new BadRequestHttpException('category is not found');
         }
 
-        $tags = Tags::find()->joinWith(['categoryHasTags', 'categoryHasTags.tag'])
+        $tags = Tags::find()->joinWith(['categoryHasTags'])
             ->where(['category_has_tags.category_id' => $category->id])
             ->all();
 

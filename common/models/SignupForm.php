@@ -19,6 +19,7 @@ class SignupForm extends Model
     public $username;
     public $email;
     public $password;
+    public $api_token;
 
 
     /**
@@ -40,6 +41,8 @@ class SignupForm extends Model
 
             ['password', 'required'],
             ['password', 'string', 'min' => 4],
+
+            ['api_token', 'safe'],
         ];
     }
 
@@ -69,11 +72,16 @@ class SignupForm extends Model
     }
 
 
-    public function signUpVkUser($username)
+    public function signUpVkUser()
     {
+        if (!$this->validate()) {
+            return null;
+        }
+
         $user = new User();
-        $user->username = $username;
-        $user->email = $username.'@email.com';
+        $user->api_token = $this->api_token;
+        $user->username = $this->username;
+        $user->email = $this->username.'@email.com';
         $user->setPassword(\Yii::$app->params['user']['autoPass']);
         $user->generateAuthKey();
 

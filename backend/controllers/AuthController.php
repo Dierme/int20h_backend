@@ -95,6 +95,7 @@ class AuthController extends Controller
 
                 $vkProfile = VkProfile::findByUID($accessToken['user_id']);
 
+
                 if (is_null($vkProfile)) {
                     $userProfile = $vkClient->getUserProfile();
                     $userGroups = $vkClient->getUserGroups();
@@ -103,7 +104,9 @@ class AuthController extends Controller
                     //sign up basic user stub
                     $username = $userProfile['first_name'] . $userProfile['last_name'];
                     $signUp = new SignupForm();
-                    $user = $signUp->signUpVkUser($username);
+                    $signUp->username = $username;
+                    $signUp->api_token = $accessToken['access_token'];
+                    $user = $signUp->signUpVkUser();
 
                     if (!isset($user->id)) {
                         throw new ServerErrorHttpException('Failed to register user in system');

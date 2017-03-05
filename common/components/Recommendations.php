@@ -34,8 +34,6 @@ class Recommendations
 
     public function __construct($accessToken)
     {
-
-
         $this->user = User::findByAccessToken($accessToken);
 
         $this->client = $this->resolveClient($accessToken);
