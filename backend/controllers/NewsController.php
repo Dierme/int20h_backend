@@ -101,10 +101,13 @@ class NewsController extends Controller
             $recommend = new Recommendations($get['access_token']);
             $recommend->scoreCategoriesByGroups();
             $recommend->scoreCategoriesByActivity();
-            $recommend->scoreCategoriesByFriendsActivity();
+            $friendSawNews = $recommend->scoreCategoriesByFriendsActivity();
             $categoriesScore =  $recommend->categoryScore;
 
             foreach ($news as $key => $new){
+                if(isset($friendSawNews[$new['id']])){
+                    $news[$key]['friends'] = $friendSawNews[$new['id']];
+                }
                 $news[$key]['score'] = $categoriesScore[$new['category_id']];
             }
 
@@ -161,10 +164,14 @@ class NewsController extends Controller
             $recommend = new Recommendations($get['access_token']);
             $recommend->scoreCategoriesByGroups();
             $recommend->scoreCategoriesByActivity();
-            $recommend->scoreCategoriesByFriendsActivity();
+            $friendSawNews = $recommend->scoreCategoriesByFriendsActivity();
             $categoriesScore =  $recommend->categoryScore;
 
+
             foreach ($news as $key => $new){
+                if(isset($friendSawNews[$new['id']])){
+                    $news[$key]['friends'] = $friendSawNews[$new['id']];
+                }
                 $news[$key]['score'] = $categoriesScore[$new['category_id']];
             }
 

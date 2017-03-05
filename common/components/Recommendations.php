@@ -119,8 +119,13 @@ class Recommendations
             ->where(['user_id' => $friendsIds])
             ->all();
 
+
+        $friendSawNews = array();
         foreach ($activity as $instance) {
             $news = $instance->getNews()->one();
+            $friendProfile = User::findOne($instance->user_id);
+            $friendVkProfile = VkProfile::find()->where(['user_id'=>$friendProfile->id])->one();
+            $friendSawNews[$news->id][$friendVkProfile->id] = $friendVkProfile->name . ' ' . $friendVkProfile->surname;
             if (empty($categoryScore[$news->category_id])) {
                 $categoryScore[$news->category_id] = 0;
                 $categoryScore[$news->category_id] += 1;
@@ -134,6 +139,8 @@ class Recommendations
         foreach ($categoryScore as $categoryId => $score) {
             $this->categoryScore[$categoryId] += (int)($score / self::ACTIVITY_DELIMITER);
         }
+
+        return $friendSawNews;
     }
 
     private function initCategoryScore($categories)
