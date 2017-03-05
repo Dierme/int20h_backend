@@ -11,22 +11,50 @@ class m170304_120347_tags extends Migration
         $this->createTable($this->tableName, [
             'id' => $this->primaryKey(),
             'name' => $this->string()->notNull(),
+            'keywords' => $this->text(),
         ]);
 
-        $this->insert($this->tableName, ['name'=>'scandal']);
-        $this->insert($this->tableName, ['name'=>'government']);
+        $this->insert($this->tableName, [
+            'name' => 'scandal',
+            'keywords' => 'скандал,политика,политический,политич'
+        ]);
+        $this->insert($this->tableName, [
+            'name' => 'government',
+            'keywords' => 'государство,государственн,держава'
+        ]);
 
-        $this->insert($this->tableName, ['name'=>'money']);
-        $this->insert($this->tableName, ['name'=>'bank']);
-
-        $this->insert($this->tableName, ['name'=>'films']);
-        $this->insert($this->tableName, ['name'=>'songs']);
-
-        $this->insert($this->tableName, ['name'=>'football']);
-        $this->insert($this->tableName, ['name'=>'basketball']);
-
-        $this->insert($this->tableName, ['name'=>'animals']);
-        $this->insert($this->tableName, ['name'=>'forest']);
+        $this->insert($this->tableName, [
+            'name' => 'money',
+            'keywords' => 'деньги,казна,бюджет,банк,зарплата'
+        ]);
+        $this->insert($this->tableName, [
+            'name' => 'bank',
+            'keywords' => 'банк,деньги,банкрот,кредит'
+        ]);
+        $this->insert($this->tableName, [
+            'name' => 'films',
+            'keywords' => 'видео,кино,сериал,фильм'
+        ]);
+        $this->insert($this->tableName, [
+            'name' => 'songs',
+            'keywords' => 'песн,песня,петь,музика,аудио,music'
+        ]);
+        $this->insert($this->tableName, [
+            'name' => 'football',
+            'keywords' => 'football,мяч,футбол,стадион,голкипер,пенальти,гол'
+        ]);
+        $this->insert($this->tableName, [
+            'name' => 'basketball',
+            'keywords' => 'баскетбол'
+        ]);
+        $this->insert($this->tableName, [
+            'name' => 'animals',
+            'keywords' => 'кот,собака,щенок,звер,животн'
+        ]);
+        $this->insert($this->tableName, [
+            'name' => 'forest',
+            'keywords' => 'лес,листва,тишина,бор,луг,депево,природа,ручей,вода,море,пилит'
+        ]);
     }
 
     public function down()

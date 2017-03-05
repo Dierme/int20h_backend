@@ -227,15 +227,9 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->hasOne(AuthAssignment::className(), ['user_id' => 'id']);
     }
 
-
-    public function generateApiToken()
+    public static function findByAccessToken($accessToken)
     {
-        $security = new Security();
-
-        $this->api_token = $security->generateRandomString();
-
-        $this->save(false);
-
-        return $this->api_token;
+        return self::find()->where(['api_token'=>$accessToken])->one();
     }
+
 }

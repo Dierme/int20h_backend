@@ -8,8 +8,12 @@
 
 namespace backend\controllers;
 
+use common\components\Recommendations;
+use common\models\ActivityTracking;
 use common\models\Category;
 use common\models\News;
+use common\models\Tags;
+use common\models\User;
 use Yii;
 use common\components\VKClient;
 use yii\web\Controller;
@@ -91,7 +95,23 @@ class NewsController extends Controller
 
         $category = $categoryQuery->one();
 
-        $news = News::find()->where(['category_id' => $category->id])->all();
+        $news = News::find()->where(['category_id' => $category->id])->asArray()->all();
+
+        if (!empty($get['access_token'])) {
+            $recommend = new Recommendations($get['access_token']);
+            $recommend->scoreCategoriesByGroups();
+            $categoriesScore =  $recommend->categoryScore;
+
+            foreach ($news as $key => $new){
+                $news[$key]['score'] = $categoriesScore[$new['category_id']];
+            }
+
+            usort($news, function($a, $b) {
+                return $b['score'] <=> $a['score'];
+            });
+
+            return $news;
+        }
 
         return $news;
     }
@@ -105,7 +125,23 @@ class NewsController extends Controller
             throw new BadRequestHttpException('id param is missing');
         }
 
+        if (empty($get['access_token'])) {
+            throw new BadRequestHttpException('access_token param is missing');
+        }
+
+
+        $user = User::findByAccessToken($get['access_token']);
+
+        if(is_null($user)){
+            throw new BadRequestHttpException('user not found');
+        }
+
         $news = News::findOne($get['id']);
+
+        $activity = new ActivityTracking();
+        $activity->user_id = $user->id;
+        $activity->news_id = $news->id;
+        $activity->save();
 
         if (is_null($news)) {
             throw new BadRequestHttpException('News is not found');
@@ -116,6 +152,26 @@ class NewsController extends Controller
 
     public function actionAll()
     {
-        return News::find()->all();
+        $get = \Yii::$app->request->get();
+        $news = News::find()->asArray()->all();
+
+        if (!empty($get['access_token'])) {
+            $recommend = new Recommendations($get['access_token']);
+            $recommend->scoreCategoriesByGroups();
+            $categoriesScore =  $recommend->categoryScore;
+
+            foreach ($news as $key => $new){
+                $news[$key]['score'] = $categoriesScore[$new['category_id']];
+            }
+
+            usort($news, function($a, $b) {
+                return $b['score'] <=> $a['score'];
+            });
+
+            return $news;
+        }
+
+
+        return $news;
     }
 }

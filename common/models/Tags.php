@@ -9,6 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property string $name
+ * @property string $keywords
  *
  * @property CategoryHasTags[] $categoryHasTags
  */
@@ -29,6 +30,7 @@ class Tags extends \yii\db\ActiveRecord
     {
         return [
             [['name'], 'required'],
+            [['keywords'], 'string'],
             [['name'], 'string', 'max' => 255],
         ];
     }
@@ -41,6 +43,7 @@ class Tags extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => 'Name',
+            'keywords' => 'Keywords',
         ];
     }
 

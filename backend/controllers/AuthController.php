@@ -108,7 +108,6 @@ class AuthController extends Controller
                     if (!isset($user->id)) {
                         throw new ServerErrorHttpException('Failed to register user in system');
                     }
-                    $apiToken = $user->generateApiToken();
 
 
                     //create user VK profile
@@ -116,7 +115,8 @@ class AuthController extends Controller
                         'name' => $userProfile['first_name'],
                         'surname' => $userProfile['last_name'],
                         'user_id' => $user->id,
-                        'vk_uid' => $userProfile['uid']
+                        'vk_uid' => $userProfile['uid'],
+                        'api_token' => $accessToken['access_token']
                     ];
                     $userVkProfile = new VkProfile();
                     $userVkProfile->setAttributes($vkParams);
@@ -171,12 +171,12 @@ class AuthController extends Controller
                 }
                 else{
                     $user = User::findOne($vkProfile->user_id);
-                    $apiToken = $user->generateApiToken();
+                    $user->api_token = $accessToken['access_token'];
+                    $user->save(false);
                 }
 
                 return [
                     'success' => true,
-                    'apiKey' => $apiToken,
                     'accessToken' => $accessToken['access_token']
                 ];
             } else {
