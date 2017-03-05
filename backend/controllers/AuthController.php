@@ -156,6 +156,32 @@ class AuthController extends Controller
                         if (!is_null($friendVkProfile)) {
 
                             $userHasFriendQuery = VkuserHasFriends::find()->where([
+                                'vk_user_id' => $userVkProfile->id,
+                                'vk_friend_id' => $friendVkProfile->id
+                            ]);
+
+                            if (!$userHasFriendQuery->exists()) {
+                                $userHasFriend = new VkuserHasFriends();
+                                $userHasFriend->setAttribute('vk_user_id', $userVkProfile->id);
+                                $userHasFriend->setAttribute('vk_friend_id', $friendVkProfile->id);
+                                $userHasFriend->save();
+                            }
+                        }
+                    }
+                }
+                else{
+                    $user = User::findOne($vkProfile->user_id);
+                    $user->api_token = $accessToken['access_token'];
+                    $user->save(false);
+
+                    $userFriends = $vkClient->getUserFriends();
+
+                    foreach ($userFriends as $friendUid) {
+                        $friendVkProfile = VkProfile::findByUID($friendUid);
+
+                        if (!is_null($friendVkProfile)) {
+
+                            $userHasFriendQuery = VkuserHasFriends::find()->where([
                                 'vk_user_id' => $vkProfile->id,
                                 'vk_friend_id' => $friendVkProfile->id
                             ]);
@@ -168,11 +194,6 @@ class AuthController extends Controller
                             }
                         }
                     }
-                }
-                else{
-                    $user = User::findOne($vkProfile->user_id);
-                    $user->api_token = $accessToken['access_token'];
-                    $user->save(false);
                 }
 
                 return [

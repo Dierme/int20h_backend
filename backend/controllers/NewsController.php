@@ -100,6 +100,8 @@ class NewsController extends Controller
         if (!empty($get['access_token'])) {
             $recommend = new Recommendations($get['access_token']);
             $recommend->scoreCategoriesByGroups();
+            $recommend->scoreCategoriesByActivity();
+            $recommend->scoreCategoriesByFriendsActivity();
             $categoriesScore =  $recommend->categoryScore;
 
             foreach ($news as $key => $new){
@@ -158,6 +160,8 @@ class NewsController extends Controller
         if (!empty($get['access_token'])) {
             $recommend = new Recommendations($get['access_token']);
             $recommend->scoreCategoriesByGroups();
+            $recommend->scoreCategoriesByActivity();
+            $recommend->scoreCategoriesByFriendsActivity();
             $categoriesScore =  $recommend->categoryScore;
 
             foreach ($news as $key => $new){

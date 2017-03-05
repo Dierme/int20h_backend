@@ -219,9 +219,12 @@ class User extends ActiveRecord implements IdentityInterface
 
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
+    public function getVkProfile()
+    {
+        return $this->hasOne(VkProfile::className(), ['id' => 'user_id']);
+    }
+
+
     public function getAssignment()
     {
         return $this->hasOne(AuthAssignment::className(), ['user_id' => 'id']);

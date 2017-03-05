@@ -73,7 +73,7 @@ class SignupForm extends Model
     {
         $user = new User();
         $user->username = $username;
-        $user->email = 'test@email.com';
+        $user->email = $username.'@email.com';
         $user->setPassword(\Yii::$app->params['user']['autoPass']);
         $user->generateAuthKey();
 
