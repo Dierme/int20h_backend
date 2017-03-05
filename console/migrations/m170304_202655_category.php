@@ -2,7 +2,7 @@
 
 use yii\db\Migration;
 
-class m170304_220147_category extends Migration
+class m170304_202655_category extends Migration
 {
     private $tableName = '{{%category}}';
 
@@ -13,7 +13,6 @@ class m170304_220147_category extends Migration
             'name' => $this->string()->notNull(),
         ]);
 
-        $this->addForeignKey('#FK_news_has_category', 'news', 'category_id', 'category', 'id');
 
         $this->insert($this->tableName, ['name' => 'politics']);
         $this->insert($this->tableName, ['name' => 'economy']);

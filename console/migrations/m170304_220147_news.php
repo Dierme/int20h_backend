@@ -2,7 +2,7 @@
 
 use yii\db\Migration;
 
-class m170304_202655_news extends Migration
+class m170304_220147_news extends Migration
 {
     private $tableName = '{{%news}}';
 
@@ -19,6 +19,9 @@ class m170304_202655_news extends Migration
             'created_at' => $this->date(),
             'updated_at' => $this->date()
         ]);
+
+
+        $this->addForeignKey('#FK_news_has_category', 'news', 'category_id', 'category', 'id');
 
         $this->insert($this->tableName, [
             'header' => 'Sport news',
