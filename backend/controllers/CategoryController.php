@@ -67,7 +67,7 @@ class CategoryController extends Controller
         return true;
     }
 
-    public function actionTags()
+    public function Tags()
     {
         $get = \Yii::$app->request->get();
 
@@ -81,9 +81,10 @@ class CategoryController extends Controller
             throw new BadRequestHttpException('category is not found');
         }
 
-        $tags = Tags::find()->joinWith(['categoryHasTags'])
+        $tags = Tags::find()->joinWith(['categoryHasTags', 'categoryHasTags.tag'])
             ->where(['category_has_tags.category_id' => $category->id])
             ->all();
+
 
         return $tags;
     }
