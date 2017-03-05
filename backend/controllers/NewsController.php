@@ -32,7 +32,8 @@ class NewsController extends Controller
                 'actions' => [
                     'get-featured' => ['get'],
                     'all' => ['get'],
-                    'get-by-category' => ['get']
+                    'get-by-category' => ['get'],
+                    'view' => ['get']
                 ],
             ]
         ];
@@ -91,6 +92,24 @@ class NewsController extends Controller
         $category = $categoryQuery->one();
 
         $news = News::find()->where(['category_id' => $category->id])->all();
+
+        return $news;
+    }
+
+
+    public function actionView()
+    {
+        $get = \Yii::$app->request->get();
+
+        if (empty($get['id'])) {
+            throw new BadRequestHttpException('id param is missing');
+        }
+
+        $news = News::findOne($get['id']);
+
+        if (is_null($news)) {
+            throw new BadRequestHttpException('News is not found');
+        }
 
         return $news;
     }

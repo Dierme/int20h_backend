@@ -13,6 +13,7 @@ namespace backend\controllers;
 
 use common\models\Category;
 use common\models\News;
+use common\models\Tags;
 use Yii;
 use yii\web\Controller;
 use yii\web\Response;
@@ -33,6 +34,8 @@ class CategoryController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'all' => ['get'],
+                    'view' => ['get'],
+                    'tags' => ['get']
                 ],
             ]
         ];
@@ -64,6 +67,43 @@ class CategoryController extends Controller
         return true;
     }
 
+    public function actionTags()
+    {
+        $get = \Yii::$app->request->get();
+
+        if (empty($get['category_id'])) {
+            throw new BadRequestHttpException('category_id param is missing');
+        }
+
+        $category = Category::findOne($get['category_id']);
+
+        if (is_null($category)) {
+            throw new BadRequestHttpException('category is not found');
+        }
+
+        $tags = Tags::find()->joinWith(['categoryHasTags'])
+            ->where(['category_has_tags.category_id' => $category->id])
+            ->all();
+
+        return $tags;
+    }
+
+    public function actionView()
+    {
+        $get = \Yii::$app->request->get();
+
+        if (empty($get['id'])) {
+            throw new BadRequestHttpException('id param is missing');
+        }
+
+        $category = Category::findOne($get['id']);
+
+        if (is_null($category)) {
+            throw new BadRequestHttpException('category is not found');
+        }
+
+        return $category;
+    }
 
     public function actionAll()
     {
